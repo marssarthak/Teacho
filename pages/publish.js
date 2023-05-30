@@ -4,10 +4,14 @@ export default function Publish() {
     const [formInput, setFormInput] = useState({
         title: "",
         description: "",
+        time: null,
         flowrate: null,
     });
 
-    async function publish() {}
+    async function publish() {
+        const dummyMeetingID = "";
+        // contract code
+    }
 
     async function createMeeting() {}
 
@@ -33,6 +37,17 @@ export default function Publish() {
                     setFormInput({
                         ...formInput,
                         description: e.target.value,
+                    })
+                }
+            />
+            <input
+                name="flowrate"
+                placeholder="Flow rate"
+                required
+                onChange={(e) =>
+                    setFormInput({
+                        ...formInput,
+                        flowrate: e.target.value,
                     })
                 }
             />
