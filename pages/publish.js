@@ -7,7 +7,7 @@ export default function Publish() {
     const [formInput, setFormInput] = useState({
         title: "",
         description: "",
-        time: null,
+        startTime: "",
         flowrate: null,
     });
 
@@ -24,15 +24,17 @@ export default function Publish() {
         const provider = new ethers.providers.Web3Provider(connection);
         const signer = provider.getSigner();
         const contract = new ethers.Contract(address, abi, signer);
-        const amountInWei = ethers.BigNumber.from(formInput.flowrate);
-        const monthlyAmount = ethers.utils.formatEther(amountInWei.toString());
-        const calculatedFlowRate = monthlyAmount * 3600 * 24 * 30;
-        const publish = await contract.createToken(
+        // const amountInWei = ethers.BigNumber.from(formInput.flowrate);
+        // const monthlyAmount = ethers.utils.formatEther(amountInWei.toString());
+        // const calculatedFlowRate = monthlyAmount * 3600 * 24 * 30;
+        const calculatedFlowRate = 385802469135802;
+        const publish = await contract.createGig(
             formInput.title,
             formInput.description,
-            formInput.time,
+            formInput.startTime,
             meetingId,
             calculatedFlowRate,
+            formInput.flowrate,
             {
                 gasLimit: 1000000,
             }
@@ -44,7 +46,7 @@ export default function Publish() {
 
     async function createMeeting() {
         // create meeting
-        return "";
+        return "test-id";
     }
 
     return (
@@ -73,19 +75,19 @@ export default function Publish() {
                 }
             />
             <input
-                name="flowrate"
-                placeholder="Flow rate matic/month"
+                name="startTime"
+                placeholder="Meeting Time"
                 required
                 onChange={(e) =>
                     setFormInput({
                         ...formInput,
-                        flowrate: e.target.value,
+                        startTime: e.target.value,
                     })
                 }
             />
             <input
                 name="flowrate"
-                placeholder="Flow rate"
+                placeholder="matic/hour"
                 required
                 onChange={(e) =>
                     setFormInput({
