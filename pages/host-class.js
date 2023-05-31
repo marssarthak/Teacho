@@ -5,12 +5,16 @@ import { address, abi } from "../config.js";
 import styles from "../styles/style";
 import { Navbar } from "../components";
 import { Input, Stack } from "@chakra-ui/react";
-import { InputLeftElement } from "@chakra-ui/react";
 import {
   FormControl,
   FormLabel,
   FormErrorMessage,
   FormHelperText,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
 } from "@chakra-ui/react";
 
 import { Heading } from "@chakra-ui/react";
@@ -20,8 +24,10 @@ export default function Publish() {
     title: "",
     description: "",
     startTime: "",
-    flowrate: null,
+    flowrate: "",
   });
+
+  console.log(formInput);
 
   async function publish() {
     const meetingId = await createMeeting();
@@ -86,91 +92,119 @@ export default function Publish() {
               <h2 className={styles.heading2}>Fill the given details.</h2>
               <div>
                 <Stack gap={2}>
-                <FormControl>
-                  <FormLabel fontSize={20} mb={1}>Title</FormLabel>
-                  <Input type="text" w="100%" borderRadius={8} py={2} px={2} color={"black"}/>
-                  {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Description</FormLabel>
-                  <Input type="text" w="100%" borderRadius={8} py={2} px={2} color={"black"} />
-                  {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
-                </FormControl>
-                <div className="flex gap-5">
-                <FormControl className="flex-1">
-                  <FormLabel>Meeting Time</FormLabel>
-                  <Input type="datetime-local" w="100%" borderRadius={8} py={2} px={2} color={"black"} />
-                  {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
-                </FormControl >
-                <FormControl className="flex-1">
-                  <FormLabel>Title</FormLabel>
-                  <InputLeftElement
-      pointerEvents='none'
-      color='gray.300'
-      fontSize='1.2em'
-      children='$'
-    />
-                  <Input type="text" w="100%" borderRadius={8} py={2} px={2} color={"black"} />
-                  {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
-                </FormControl>
-                </div>
+                  <FormControl>
+                    <FormLabel fontSize={20} mb={1}>
+                      Title
+                    </FormLabel>
+                    <Input
+                      type="text"
+                      w="100%"
+                      borderRadius={8}
+                      py={2}
+                      px={2}
+                      color={"black"}
+                      name="title"
+                      placeholder="Title"
+                      required
+                      value={formInput.title}
+                      onChange={(e) =>
+                        setFormInput({
+                          ...formInput,
+                          title: e.target.value,
+                        })
+                      }
+                    />
+                    {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
+                  </FormControl>
+                  <FormControl>
+                    <FormLabel>Description</FormLabel>
+                    <Input
+                      type="text"
+                      w="100%"
+                      borderRadius={8}
+                      py={2}
+                      px={2}
+                      color={"black"}
+                      name="description"
+                      placeholder="Description"
+                      required
+                      onChange={(e) =>
+                        setFormInput({
+                          ...formInput,
+                          description: e.target.value,
+                        })
+                      }
+                      value={formInput.description}
+                    />
+                    {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
+                  </FormControl>
+                  <div className="flex gap-5">
+                    <FormControl className="flex-1">
+                      <FormLabel>Meeting Time</FormLabel>
+                      <Input
+                        type="datetime-local"
+                        w="100%"
+                        borderRadius={8}
+                        py={2}
+                        px={2}
+                        color={"black"}
+                        name="startTime"
+                        placeholder="Meeting Time"
+                        required
+                        value={formInput.startTime}
+                        onChange={(e) =>
+                          setFormInput({
+                            ...formInput,
+                            startTime: e.target.value,
+                          })
+                        }
+                      />
+                      {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
+                    </FormControl>
+                    <FormControl className="flex-1">
+                      <FormLabel>Flow Rate(matic/hour)</FormLabel>
+                      <NumberInput
+                        precision={2}
+                        step={0.05}
+                        value={formInput.flowrate}
+                        onChange={(rate) =>
+                          setFormInput({
+                            ...formInput,
+                            flowrate: rate,
+                          })
+                        }
+                      >
+                        <NumberInputField
+                          w="100%"
+                          borderRadius={8}
+                          py={2}
+                          px={2}
+                          color={"black"}
+                          name="flowrate"
+                          placeholder="matic/hour"
+                          required
+                        />
+                        <NumberInputStepper>
+                          <NumberIncrementStepper />
+                          <NumberDecrementStepper />
+                        </NumberInputStepper>
+                      </NumberInput>
+                    </FormControl>
+                  </div>
                 </Stack>
               </div>
-            </div>
-
-            <div className={`${styles.flexCenter} sm:ml-10 ml-0 sm:mt-0 mt-10`}>
-              {/* <Button /> */}
+              <div className={`mt-8`}>
+                <button
+                  type="button"
+                  onClick={publish}
+                  className={`py-4 px-6 font-poppins font-medium text-[18px] text-primary bg-blue-gradient rounded-[10px] outline-none ${styles}`}
+                >
+                  Host Class
+                </button>
+              </div>
             </div>
           </section>
         </div>
-      </div>
-      <div>
-        Publish
-        <input
-          name="title"
-          placeholder="Title"
-          required
-          onChange={(e) =>
-            setFormInput({
-              ...formInput,
-              title: e.target.value,
-            })
-          }
-        />
-        <input
-          name="description"
-          placeholder="Description"
-          required
-          onChange={(e) =>
-            setFormInput({
-              ...formInput,
-              description: e.target.value,
-            })
-          }
-        />
-        <input
-          name="startTime"
-          placeholder="Meeting Time"
-          required
-          onChange={(e) =>
-            setFormInput({
-              ...formInput,
-              startTime: e.target.value,
-            })
-          }
-        />
-        <input
-          name="flowrate"
-          placeholder="matic/hour"
-          required
-          onChange={(e) =>
-            setFormInput({
-              ...formInput,
-              flowrate: e.target.value,
-            })
-          }
-        />
-        <button onClick={publish}>Publish</button>
       </div>
     </div>
   );
