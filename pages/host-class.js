@@ -4,7 +4,8 @@ import web3modal from "web3modal";
 import { address, abi } from "../config.js";
 import styles from "../styles/style";
 import { Navbar } from "../components";
-import { Input } from "@chakra-ui/react";
+import { Input, Stack } from "@chakra-ui/react";
+import { InputLeftElement } from "@chakra-ui/react";
 import {
   FormControl,
   FormLabel,
@@ -79,36 +80,41 @@ export default function Publish() {
       <div className={`bg-primary ${styles.flexStart}`}>
         <div className={`${styles.boxWidth}`}>
           <section
-            className={`${styles.flexCenter} ${styles.marginY} ${styles.padding} sm:flex-row flex-col bg-black-gradient-2 rounded-[20px] box-shadow`}
+            className={`${styles.flexCenter} ${styles.marginY} ${styles.padding} sm:flex-row flex-col bg-black-gradient-2 rounded-[20px] box-shadow mx-10`}
           >
             <div className="flex-1 flex flex-col">
               <h2 className={styles.heading2}>Fill the given details.</h2>
               <div>
+                <Stack gap={2}>
                 <FormControl>
-                  <FormLabel>Title</FormLabel>
-                  <Input type="text" />
+                  <FormLabel fontSize={20} mb={1}>Title</FormLabel>
+                  <Input type="text" w="100%" borderRadius={8} py={2} px={2} color={"black"}/>
                   {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
                 </FormControl>
                 <FormControl>
-                  <FormLabel>Title</FormLabel>
-                  <Input type="text" />
+                  <FormLabel>Description</FormLabel>
+                  <Input type="text" w="100%" borderRadius={8} py={2} px={2} color={"black"} />
                   {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
                 </FormControl>
-                <FormControl>
+                <div className="flex gap-5">
+                <FormControl className="flex-1">
+                  <FormLabel>Meeting Time</FormLabel>
+                  <Input type="datetime-local" w="100%" borderRadius={8} py={2} px={2} color={"black"} />
+                  {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
+                </FormControl >
+                <FormControl className="flex-1">
                   <FormLabel>Title</FormLabel>
-                  <Input type="text" />
+                  <InputLeftElement
+      pointerEvents='none'
+      color='gray.300'
+      fontSize='1.2em'
+      children='$'
+    />
+                  <Input type="text" w="100%" borderRadius={8} py={2} px={2} color={"black"} />
                   {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
                 </FormControl>
-                <FormControl>
-                  <FormLabel>Title</FormLabel>
-                  <Input type="text" />
-                  {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Title</FormLabel>
-                  <Input type="text" />
-                  {/* <FormHelperText>We'll never share your email.</FormHelperText> */}
-                </FormControl>
+                </div>
+                </Stack>
               </div>
             </div>
 
