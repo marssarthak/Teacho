@@ -23,7 +23,7 @@ export default function MyClasses() {
     }
 
     useEffect(() => {
-        initialize();
+        // initialize();
         fetchMyClasses();
     }, []);
 
@@ -42,21 +42,29 @@ export default function MyClasses() {
     }
 
     async function fetchMyClasses() {
-        const ethersProvider = await getEthersProvider();
-        const contract = new ethers.Contract(address, abi, ethersProvider);
-        const data = await contract.myClasses();
+        // const ethersProvider = await getEthersProvider();
+        const modal = new web3modal({
+            network: "mumbai",
+            cacheProvider: true,
+        });
+        const connection = await modal.connect();
+        const provider = new ethers.providers.Web3Provider(connection);
+        let accounts = await provider.send("eth_requestAccounts", []);
+        let senderAddress = accounts[0];
+        const contract = new ethers.Contract(address, abi, provider);
+        const data = await contract.myClasses(senderAddress);
         const itemsFetched = await Promise.all(
             data.map(async (i) => {
                 let parseStringFlowRate = ethers.utils.formatEther(i.stringFlowRate);
                 let item = {
-                    host: i.host,
+                    host: i.host.toString(),
                     title: i.title,
                     description: i.description,
                     time: i.time,
                     meetingId: i.meetingId,
-                    flowRate: i.flowRate,
+                    flowRate: i.flowRate.toNumber(),
                     stringFlowRate: parseStringFlowRate,
-                    gigId: i.gigId,
+                    gigId: i.gigId.toNumber(),
                     nftTokenId: i.nftTokenId.toNumber(),
                     attendees: i.attendees.toNumber(),
                 };
@@ -149,9 +157,9 @@ export default function MyClasses() {
     return (
         <div className="flex flex-col">
             My classes
-            <button onClick={startFlow}>start flow</button>
+            {/* <button onClick={startFlow}>start flow</button>
             <button onClick={stopFlow}>stop flow</button>
-            <button onClick={getFlowInfo}>Get info</button>
+            <button onClick={getFlowInfo}>Get info</button> */}
             <div className="text-black">
                 {gigs.map((item, i) => (
                     <Card
