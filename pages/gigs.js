@@ -24,6 +24,7 @@ export default function Gigs() {
         const data = await contract.listGigs();
         const itemsFetched = await Promise.all(
             data.map(async (i) => {
+                let parseStringFlowRate = ethers.utils.formatEther(i.stringFlowRate);
                 let item = {
                     host: i.host.toString(),
                     title: i.title,
@@ -31,8 +32,11 @@ export default function Gigs() {
                     time: i.time,
                     meetingId: i.meetingId,
                     flowRate: i.flowRate.toNumber(),
-                    stringFlowRate: i.stringFlowRate.toNumber(),
+                    stringFlowRate: parseStringFlowRate,
                     gigId: i.gigId.toNumber(),
+                    nftTokenId: i.nftTokenId.toNumber(),
+                    attendees: i.attendees.toNumber(),
+
                 };
                 return item;
             })
@@ -53,13 +57,14 @@ export default function Gigs() {
         const provider = new ethers.providers.Web3Provider(connection);
         const signer = provider.getSigner();
         const contract = new ethers.Contract(address, abi, signer);
-        const advancePay = prop.stringFlowRate * 0.2;
+        const advancePay = prop.stringFlowRate * 10/100;
         const price = ethers.utils.parseUnits(advancePay.toString(), "ether");
         const transaction = await contract.buy(prop.gigId, {
             value: price,
             gasLimit: 1000000,
         });
         await transaction.wait();
+        console.log("purchased")
         fetchAllGigs();
     }
 
@@ -78,7 +83,7 @@ export default function Gigs() {
     return (
         <div>
             Gigs
-            <div>
+            <div className="text-black">
                 {gigs.map((item, i) => (
                     <Card
                         key={i}

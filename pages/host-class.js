@@ -24,15 +24,20 @@ export default function Publish() {
     title: "",
     description: "",
     startTime: "",
-    flowrate: "",
+    stringFlowRate: "",
   });
 
   console.log(formInput);
 
   async function publish() {
     const meetingId = await createMeeting();
+    
+    // const amountInWei = ethers.BigNumber.from(formInput.flowrate);
+    // const monthlyAmount = ethers.utils.formatEther(amountInWei.toString());
+    // const calculatedFlowRate = monthlyAmount * 3600 * 24 * 30;
+    const calculatedFlowRate = 385802469135802;
 
-    if ((!formInput.title, !formInput.description, !formInput.time, !meetingId))
+    if ((!formInput.title, !formInput.description, !formInput.time, !meetingId, !formInput.stringFlowRate))
       return;
 
     const modal = new web3modal({
@@ -43,17 +48,14 @@ export default function Publish() {
     const provider = new ethers.providers.Web3Provider(connection);
     const signer = provider.getSigner();
     const contract = new ethers.Contract(address, abi, signer);
-    // const amountInWei = ethers.BigNumber.from(formInput.flowrate);
-    // const monthlyAmount = ethers.utils.formatEther(amountInWei.toString());
-    // const calculatedFlowRate = monthlyAmount * 3600 * 24 * 30;
-    const calculatedFlowRate = 385802469135802;
+    const parseStringFlowRate = ethers.utils.parseEther(formInput.stringFlowRate);
     const publish = await contract.createGig(
       formInput.title,
       formInput.description,
       formInput.startTime,
       meetingId,
       calculatedFlowRate,
-      formInput.flowrate,
+      parseStringFlowRate,
       {
         gasLimit: 1000000,
       }
@@ -68,8 +70,13 @@ export default function Publish() {
     return "test-id";
   }
 
+  function debug() {
+    console.log(formInput)
+  }
+
   return (
     <div className="bg-primary w-full overflow-hidden min-h-screen">
+      <button onClick={debug}>debug</button>
       <div className={`${styles.paddingX} ${styles.flexCenter}`}>
         <div className={`${styles.boxWidth}`}>
           <Navbar />
@@ -164,13 +171,11 @@ export default function Publish() {
                     <FormControl className="flex-1">
                       <FormLabel>Flow Rate(matic/hour)</FormLabel>
                       <NumberInput
-                        precision={2}
-                        step={0.05}
-                        value={formInput.flowrate}
+                        value={formInput.stringFlowRate}
                         onChange={(rate) =>
                           setFormInput({
                             ...formInput,
-                            flowrate: rate,
+                            stringFlowRate: rate,
                           })
                         }
                       >

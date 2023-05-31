@@ -24,7 +24,7 @@ export default function MyClasses() {
 
     useEffect(() => {
         initialize();
-        // fetchMyClasses();
+        fetchMyClasses();
     }, []);
 
     async function initialize() {
@@ -47,6 +47,7 @@ export default function MyClasses() {
         const data = await contract.myClasses();
         const itemsFetched = await Promise.all(
             data.map(async (i) => {
+                let parseStringFlowRate = ethers.utils.formatEther(i.stringFlowRate);
                 let item = {
                     host: i.host,
                     title: i.title,
@@ -54,8 +55,10 @@ export default function MyClasses() {
                     time: i.time,
                     meetingId: i.meetingId,
                     flowRate: i.flowRate,
-                    stringFlowRate: i.stringFlowRate,
+                    stringFlowRate: parseStringFlowRate,
                     gigId: i.gigId,
+                    nftTokenId: i.nftTokenId.toNumber(),
+                    attendees: i.attendees.toNumber(),
                 };
                 return item;
             })
@@ -149,7 +152,7 @@ export default function MyClasses() {
             <button onClick={startFlow}>start flow</button>
             <button onClick={stopFlow}>stop flow</button>
             <button onClick={getFlowInfo}>Get info</button>
-            <div>
+            <div className="text-black">
                 {gigs.map((item, i) => (
                     <Card
                         key={i}
