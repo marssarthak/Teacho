@@ -282,7 +282,8 @@ export default function MyClasses() {
                 {/* <button onClick={startFlow}>start flow</button>
             <button onClick={stopFlow}>stop flow</button>
             <button onClick={getFlowInfo}>Get info</button> */}
-                <div className="pb-20">
+            <div className="flex">
+                <div className="pb-20 flex-1">
                     {gigs.map((item, i) => (
                         <Card
                             key={i}
@@ -297,6 +298,11 @@ export default function MyClasses() {
                         />
                     ))}
                 </div>
+                <div className="flex-1 flex flex-col items-center">
+                    <div className="w-96 h-96 bg-white text-black">camera</div>
+                     <button>End Meeting</button>
+                </div>
+            </div>
             </div>
         </div>
     );
