@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import web3modal from "web3modal";
 import { address, abi } from "../config.js";
+import styles from "../styles/style";
+import { Navbar } from "../components";
 
 export default function Gigs() {
     const [gigs, setGigs] = useState([]);
 
     useEffect(() => {
-        fetchAllGigs()
+        // fetchAllGigs()
     }, []);
 
     async function getEthersProvider() {
@@ -81,22 +83,36 @@ export default function Gigs() {
     }
 
     return (
-        <div>
-            Gigs
-            <div className="text-black">
-                {gigs.map((item, i) => (
-                    <Card
-                        key={i}
-                        host={item.host}
-                        title={item.title}
-                        description={item.description}
-                        time={item.time}
-                        meetingId={item.meetingId}
-                        flowRate={item.flowRate}
-                        stringFlowRate={item.stringFlowRate}
-                        gigId={item.gigId}
-                    />
-                ))}
+        <div className="bg-primary w-full overflow-hidden min-h-screen">
+            <div className={`${styles.paddingX} ${styles.flexCenter}`}>
+                <div className={`${styles.boxWidth}`}>
+                    <Navbar />
+                </div>
+            </div>
+            <div className={`bg-primary ${styles.flexStart} mt-5 text-center`}>
+                <div className={`${styles.boxWidth}`}>
+                    <h1 className="flex-1 font-poppins font-semibold ss:text-[72px] text-[52px] text-white ss:leading-[100.8px] leading-[75px]">
+                        Browse all courses <span className="text-gradient">on Teacho</span>{" "}
+                    </h1>
+                </div>
+            </div>
+            <div>
+                Gigs
+                <div className="text-black">
+                    {gigs.map((item, i) => (
+                        <Card
+                            key={i}
+                            host={item.host}
+                            title={item.title}
+                            description={item.description}
+                            time={item.time}
+                            meetingId={item.meetingId}
+                            flowRate={item.flowRate}
+                            stringFlowRate={item.stringFlowRate}
+                            gigId={item.gigId}
+                        />
+                    ))}
+                </div>
             </div>
         </div>
     );
