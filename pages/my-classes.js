@@ -5,16 +5,22 @@ import web3modal from "web3modal";
 import { address, abi } from "../config.js";
 import styles from "../styles/style";
 import { Navbar } from "../components";
+import { useHuddle01 } from "@huddle01/react";
+import { useLobby, useAudio, useVideo } from "@huddle01/react/hooks";
 
 export default function MyClasses() {
-    const receiverAddress = `0x248F5db296Ae4D318816e72c25c93e620341f621`;
-    const flowRate = `385802469135802`;
+    // const receiverAddress = `0x248F5db296Ae4D318816e72c25c93e620341f621`;
+    // const flowRate = `385802469135802`;
 
-    const [superTokenAddress, setSuperTokenAddress] = useState(
-        `0x96B82B65ACF7072eFEb00502F45757F254c2a0D4`
-    );
+    const superTokenAddress = `0x96B82B65ACF7072eFEb00502F45757F254c2a0D4`;
     const [superToken, setSuperToken] = useState();
     const [gigs, setGigs] = useState([]);
+    const [userAddress, setUserAddress] = useState();
+
+    const { initialize, isInitialized } = useHuddle01();
+    const { joinLobby } = useLobby();
+    const { fetchAudioStream, stopAudioStream, error: micError } = useAudio();
+    const { fetchVideoStream, stopVideoStream, error: camError } = useVideo();
 
     async function getEthersProvider() {
         const infuraKey = process.env.NEXT_PUBLIC_INFURA_KEY;
@@ -25,26 +31,26 @@ export default function MyClasses() {
     }
 
     useEffect(() => {
-        initialize();
+        sfInitialize();
+        fetchUserAddress();
         fetchMyClasses();
+        initialize("KL1r3E1yHfcrRbXsT4mcE-3mK60Yc3YR");
     }, []);
 
-    async function initialize() {
-        const provider = await getEthersProvider()
+    async function sfInitialize() {
+        const provider = await getEthersProvider();
         const xsf = await Framework.create({
             chainId: 80001,
             provider,
         });
-        // setSf(xsf);
-
         const sT = await xsf.loadSuperToken(superTokenAddress);
         setSuperToken(sT);
 
         console.log("ready");
+        return sT;
     }
 
-    async function fetchMyClasses() {
-        // const ethersProvider = await getEthersProvider();
+    async function fetchUserAddress() {
         const modal = new web3modal({
             network: "mumbai",
             cacheProvider: true,
@@ -53,11 +59,20 @@ export default function MyClasses() {
         const provider = new ethers.providers.Web3Provider(connection);
         let accounts = await provider.send("eth_requestAccounts", []);
         let senderAddress = accounts[0];
+        setUserAddress(senderAddress);
+        return senderAddress;
+    }
+
+    async function fetchMyClasses() {
+        const provider = await getEthersProvider();
+        const senderAddress = await fetchUserAddress();
         const contract = new ethers.Contract(address, abi, provider);
         const data = await contract.myClasses(senderAddress);
         const itemsFetched = await Promise.all(
             data.map(async (i) => {
-                let parseStringFlowRate = ethers.utils.formatEther(i.stringFlowRate);
+                let parseStringFlowRate = ethers.utils.formatEther(
+                    i.stringFlowRate
+                );
                 let item = {
                     host: i.host.toString(),
                     title: i.title,
@@ -80,29 +95,66 @@ export default function MyClasses() {
         return itemsFetched;
     }
 
-    async function joinMeeting() {
-        await startFlow(receiverAddress, flowRate);
-        await getFlowInfo(receiverAddress);
-        // join meeting 
+    function TestJoinMeeting(prop) {
+        joinLobby(prop.meetingId)
+        fetchAudioStream
+
+        // return (
+        //     <div className="flex gap-4">
+        //         {isInitialized ? "Hello World!" : "Please initialize"}
+        //         <button
+        //             disabled={joinLobby.isCallable}
+        //             onClick={() => joinLobby(prop.meetingId)}
+        //         >
+        //             {console.log(prop.meetingId)}
+        //             Join Lobby
+        //         </button>
+
+        //         {/* Mic */}
+        //         <button
+        //             disabled={!fetchAudioStream.isCallable}
+        //             onClick={fetchAudioStream}
+        //         >
+        //             FETCH_AUDIO_STREAM
+        //         </button>
+
+        //         {/* Webcam */}
+        //         <button
+        //             disabled={!fetchVideoStream.isCallable}
+        //             onClick={fetchVideoStream}
+        //         >
+        //             FETCH_VIDEO_STREAM
+        //         </button>
+        //     </div>
+        // );
     }
 
-    async function endMeeting() {
-        await stopFlow(receiverAddress);
+    async function joinMeeting(prop) {
+        // join meeting
+        await startFlow(prop.host, prop.flowRate);
+        await getFlowInfo(prop.host);
+    }
+
+    async function endMeeting(prop) {
         // end meeting
+        await stopFlow(prop.host);
     }
 
     async function startFlow(xReceiverAddress, xFlowRate) {
+        const senderAddress = await fetchUserAddress();
+        const xSuperToken = await sfInitialize();
+
+        console.log(senderAddress, xReceiverAddress, xFlowRate);
+
         const modal = new web3modal({
             network: "mumbai",
             cacheProvider: true,
         });
         const connection = await modal.connect();
         const provider = new ethers.providers.Web3Provider(connection);
-        let accounts = await provider.send("eth_requestAccounts", []);
-        let senderAddress = accounts[0];
         const signer = provider.getSigner();
 
-        const createFlowOperation = superToken.createFlow({
+        const createFlowOperation = xSuperToken.createFlow({
             sender: senderAddress,
             receiver: xReceiverAddress,
             flowRate: xFlowRate,
@@ -120,12 +172,10 @@ export default function MyClasses() {
         });
         const connection = await modal.connect();
         const provider = new ethers.providers.Web3Provider(connection);
-        let accounts = await provider.send("eth_requestAccounts", []);
-        let senderAddress = accounts[0];
         const signer = provider.getSigner();
 
         const flowOp = superToken.deleteFlow({
-            sender: senderAddress,
+            sender: userAddress,
             receiver: xReceiverAddress,
         });
 
@@ -135,9 +185,9 @@ export default function MyClasses() {
     }
 
     async function getFlowInfo(xReceiverAddress) {
-        const provider = await getEthersProvider()
+        const provider = await getEthersProvider();
         const flowInfo = await superToken.getFlow({
-            sender: senderAddress,
+            sender: userAddress,
             receiver: xReceiverAddress,
             providerOrSigner: provider,
         });
@@ -146,12 +196,24 @@ export default function MyClasses() {
 
     function Card(prop) {
         return (
-            <div>
+            <div className="mb-5">
                 <p>{prop.title}</p>
                 <p>{prop.description}</p>
                 <p>{prop.time}</p>
                 <p>{prop.stringFlowRate} Matic/Hour</p>
+                {/* <TestJoinMeeting
+                    host={prop.host}
+                    title={prop.title}
+                    description={prop.description}
+                    time={prop.time}
+                    meetingId={prop.meetingId}
+                    flowRate={prop.flowRate}
+                    stringFlowRate={prop.stringFlowRate}
+                    gigId={prop.gigId}
+                /> */}
+                {/* <button onClick={() => TestJoinMeeting(prop)}>Join Test Meeting</button> */}
                 <button onClick={() => joinMeeting(prop)}>Join Meeting</button>
+                {/* <button onClick={() => endMeeting(prop)}>End Meeting</button> */}
             </div>
         );
     }
@@ -166,31 +228,31 @@ export default function MyClasses() {
             <div className={`bg-primary ${styles.flexStart} mt-5 text-center`}>
                 <div className={`${styles.boxWidth}`}>
                     <h1 className="flex-1 font-poppins font-semibold ss:text-[72px] text-[52px] text-white ss:leading-[100.8px] leading-[75px]">
-                    Purchases<span className="text-gradient"></span>{" "}
+                        Purchases<span className="text-gradient"></span>{" "}
                     </h1>
                 </div>
             </div>
             <div>
-            My classes
-            {/* <button onClick={startFlow}>start flow</button>
+                My classes
+                {/* <button onClick={startFlow}>start flow</button>
             <button onClick={stopFlow}>stop flow</button>
             <button onClick={getFlowInfo}>Get info</button> */}
-            <div className="">
-                {gigs.map((item, i) => (
-                    <Card
-                        key={i}
-                        host={item.host}
-                        title={item.title}
-                        description={item.description}
-                        time={item.time}
-                        meetingId={item.meetingId}
-                        flowRate={item.flowRate}
-                        stringFlowRate={item.stringFlowRate}
-                        gigId={item.gigId}
-                    />
-                ))}
+                <div className="">
+                    {gigs.map((item, i) => (
+                        <Card
+                            key={i}
+                            host={item.host}
+                            title={item.title}
+                            description={item.description}
+                            time={item.time}
+                            meetingId={item.meetingId}
+                            flowRate={item.flowRate}
+                            stringFlowRate={item.stringFlowRate}
+                            gigId={item.gigId}
+                        />
+                    ))}
+                </div>
             </div>
-        </div>
         </div>
     );
 }
