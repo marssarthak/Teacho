@@ -4,6 +4,7 @@ import web3modal from "web3modal";
 import { address, abi } from "../config.js";
 import styles from "../styles/style";
 import { Navbar } from "../components";
+import Image from "next/image.js";
 
 export default function Gigs() {
     const [gigs, setGigs] = useState([]);
@@ -71,13 +72,44 @@ export default function Gigs() {
     }
 
     function Card(prop) {
+        const add0 = t => t < 10 ? `0${t}` : String(t);
+        const getDateStandard = (dt) => {
+            const y = dt.getFullYear();
+            const m = add0(dt.getMonth() + 1);
+            const d = add0(dt.getDate()); //day of month
+            const w = dt.toDateString().substring(0, 3); //day of week enum, either Mon, Tue, Wed, Thu, Fri, Sat, Sun
+            const h = add0(dt.getHours());
+            const min = add0(dt.getMinutes());
+            return `${d}-${m}-${y} ${w} ${h}:${min}`;
+          };
+        const dateTime = new Date(prop.time)
         return (
-            <div>
-                <p>{prop.title}</p>
-                <p>{prop.description}</p>
-                <p>{prop.time}</p>
-                <p>{prop.stringFlowRate} Matic/Hour</p>
-                <button onClick={() => buy(prop)}>Buy</button>
+            <div className={`bg-primary ${styles.flexStart}`}>
+                <div className={`${styles.boxWidth}`}>
+                <section
+                    className={`${styles.flexCenter} ${styles.marginY} !mb-0 ${styles.padding}sm:flex-row flex-col bg-black-gradient-3 rounded-[20px] box-shadow mx-10`}
+                >
+                    <div className="flex-1 flex flex-col w-full">
+                        <div className="flex items-center justify-between w-full">
+                            <div className="grow-[3] max-w-[75%]">
+                                <h1 className="flex-1 font-poppins font-semibold ss:text-[40px] text-[32px] text-white ss:leading-[50.8px] leading-[45px] capitalize">{prop.title}</h1>
+                                <p className="font-thin text-slate-200 mt-1 leading-5">{prop.description}</p>
+                                <p className="mt-3 text-gray-500">Date: {getDateStandard(dateTime)}</p>
+                            </div>
+                            <div className="flex flex-1 justify-center items-end flex-col">
+                                <p >Price: {prop.stringFlowRate} Matic/Hour</p>
+                                <button
+                                    type="button"
+                                    onClick={() => buy(prop)}
+                                    className={`py-4 mt-2 px-12 font-poppins font-medium text-[18px] text-primary bg-blue-gradient rounded-[10px] outline-none ${styles}`}
+                                    >
+                                    Buy
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                </div>
             </div>
         );
     }
@@ -97,7 +129,6 @@ export default function Gigs() {
                 </div>
             </div>
             <div>
-                Gigs
                 <div className="">
                     {gigs.map((item, i) => (
                         <Card
