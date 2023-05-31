@@ -24,7 +24,7 @@ export default function MyClasses() {
 
     useEffect(() => {
         initialize();
-        fetchMyClasses();
+        // fetchMyClasses();
     }, []);
 
     async function initialize() {

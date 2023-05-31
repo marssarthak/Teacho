@@ -10,12 +10,12 @@ export const navLinks = [
     title: "Host Class",
   },
   {
-    id: "product",
-    title: "Product",
+    id: "/gigs",
+    title: "Gigs",
   },
   {
-    id: "clients",
-    title: "Clients",
+    id: "/my-classes",
+    title: "My Classes",
   },
 ];
 
