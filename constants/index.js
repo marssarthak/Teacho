@@ -23,23 +23,23 @@ export const features = [
   {
     id: "feature-1",
     icon: star,
-    title: "Rewards",
+    title: "Pay Per second",
     content:
-      "The best credit cards offer some tantalizing combinations of promotions and prizes",
+      "Introducing the revolutionary pay-per-second feature that eliminates the need for upfront payment.",
   },
   {
     id: "feature-2",
     icon: shield,
     title: "100% Secured",
     content:
-      "We take proactive steps make sure your information and transactions are secure.",
+      "Unleash the power of blockchain security - Trust guaranteed with smart contracts.",
   },
   {
     id: "feature-3",
     icon: send,
     title: "Balance Transfer",
     content:
-      "A balance transfer credit card can save you a lot of money in interest charges.",
+      "Empower transparent learning with direct money transfers from students to teachers on our Web3.0 teaching platform!",
   },
 ];
 
@@ -73,18 +73,18 @@ export const feedback = [
 export const stats = [
   {
     id: "stats-1",
-    title: "User Active",
-    value: "3800+",
+    title: "Upfront payment",
+    value: "20%",
   },
   {
     id: "stats-2",
-    title: "Trusted by Company",
-    value: "230+",
+    title: "Pay per second",
+    value: "80%",
   },
   {
     id: "stats-3",
-    title: "Transaction",
-    value: "$230M+",
+    title: "Trust and security",
+    value: "100%",
   },
 ];
 

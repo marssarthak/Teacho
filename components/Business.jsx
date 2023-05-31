@@ -19,17 +19,19 @@ const FeatureCard = ({ icon, title, content, index }) => (
   </div>
 );
 
-const Business = () =>  (
+const Business = () => (
   <section id="features" className={layout.section}>
     <div className={layout.sectionInfo}>
       <h2 className={styles.heading2}>
-        You do the business, <br className="sm:block hidden" /> we’ll handle
-        the money.
+        Tired of the lack of trust <br className="sm:block hidden" /> in online
+        courses?
       </h2>
       <p className={`${styles.paragraph} max-w-[470px] mt-5`}>
-        With the right credit card, you can improve your financial life by
-        building credit, earning rewards and saving money. But with hundreds
-        of credit cards on the market.
+        We are revolutionizing online education with our pay-per-second feature. 
+        Students' account balances are deducted only for the time they actively participate in the meeting.
+        As soon as they leave, the deductions stop, ensuring a secure and
+        transparent payment system that guarantees both student satisfaction and
+        peace of mind.
       </p>
 
       <Button styles={`mt-10`} />
