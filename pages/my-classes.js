@@ -3,6 +3,8 @@ import { Framework } from "@superfluid-finance/sdk-core";
 import { ethers } from "ethers";
 import web3modal from "web3modal";
 import { address, abi } from "../config.js";
+import styles from "../styles/style";
+import { Navbar } from "../components";
 
 export default function MyClasses() {
     const receiverAddress = `0x248F5db296Ae4D318816e72c25c93e620341f621`;
@@ -23,7 +25,7 @@ export default function MyClasses() {
     }
 
     useEffect(() => {
-        // initialize();
+        initialize();
         fetchMyClasses();
     }, []);
 
@@ -72,7 +74,7 @@ export default function MyClasses() {
             })
         );
 
-        console.log("gigs", itemsFetched);
+        console.log("inventory", itemsFetched);
         setGigs(itemsFetched);
 
         return itemsFetched;
@@ -155,12 +157,25 @@ export default function MyClasses() {
     }
 
     return (
-        <div className="flex flex-col">
+        <div className="bg-primary w-full overflow-hidden min-h-screen">
+            <div className={`${styles.paddingX} ${styles.flexCenter}`}>
+                <div className={`${styles.boxWidth}`}>
+                    <Navbar />
+                </div>
+            </div>
+            <div className={`bg-primary ${styles.flexStart} mt-5 text-center`}>
+                <div className={`${styles.boxWidth}`}>
+                    <h1 className="flex-1 font-poppins font-semibold ss:text-[72px] text-[52px] text-white ss:leading-[100.8px] leading-[75px]">
+                    Purchases<span className="text-gradient"></span>{" "}
+                    </h1>
+                </div>
+            </div>
+            <div>
             My classes
             {/* <button onClick={startFlow}>start flow</button>
             <button onClick={stopFlow}>stop flow</button>
             <button onClick={getFlowInfo}>Get info</button> */}
-            <div className="text-black">
+            <div className="">
                 {gigs.map((item, i) => (
                     <Card
                         key={i}
@@ -175,6 +190,7 @@ export default function MyClasses() {
                     />
                 ))}
             </div>
+        </div>
         </div>
     );
 }

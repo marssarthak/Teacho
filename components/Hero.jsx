@@ -34,7 +34,7 @@ const Hero = () => {
           Teaching Platform.
         </h1>
         <p className={`${styles.paragraph} max-w-[470px] mt-5`}>
-          embrace the future of online education with our Web3.0 teaching
+          Embrace the future of online education with our Web3.0 teaching
           platform - pay per second for fair and transparent payment system!
         </p>
       </div>

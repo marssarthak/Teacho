@@ -76,7 +76,7 @@ export default function Publish() {
 
   return (
     <div className="bg-primary w-full overflow-hidden min-h-screen">
-      <button onClick={debug}>debug</button>
+      {/* <button onClick={debug}>debug</button> */}
       <div className={`${styles.paddingX} ${styles.flexCenter}`}>
         <div className={`${styles.boxWidth}`}>
           <Navbar />

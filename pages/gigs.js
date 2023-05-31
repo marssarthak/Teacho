@@ -9,7 +9,7 @@ export default function Gigs() {
     const [gigs, setGigs] = useState([]);
 
     useEffect(() => {
-        // fetchAllGigs()
+        fetchAllGigs()
     }, []);
 
     async function getEthersProvider() {
@@ -44,7 +44,7 @@ export default function Gigs() {
             })
         );
 
-        console.log("gigs", itemsFetched);
+        console.log("store", itemsFetched);
         setGigs(itemsFetched);
 
         return itemsFetched;
@@ -92,13 +92,13 @@ export default function Gigs() {
             <div className={`bg-primary ${styles.flexStart} mt-5 text-center`}>
                 <div className={`${styles.boxWidth}`}>
                     <h1 className="flex-1 font-poppins font-semibold ss:text-[72px] text-[52px] text-white ss:leading-[100.8px] leading-[75px]">
-                        Browse all courses <span className="text-gradient">on Teacho</span>{" "}
+                        Browse all lectures <span className="text-gradient">on Teacho</span>{" "}
                     </h1>
                 </div>
             </div>
             <div>
                 Gigs
-                <div className="text-black">
+                <div className="">
                     {gigs.map((item, i) => (
                         <Card
                             key={i}

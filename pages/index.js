@@ -24,10 +24,10 @@ export default function Home() {
       <div className={`${styles.boxWidth}`}>
         <Stats />
         <Business />
-        <Billing />
+        {/* <Billing /> */}
         <CardDeal />
-        <Testimonials />
-        <Clients />
+        {/* <Testimonials /> */}
+        {/* <Clients /> */}
         <CTA />
         <Footer />
       </div>
