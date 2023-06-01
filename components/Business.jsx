@@ -28,7 +28,7 @@ const Business = () => (
       </h2>
       <p className={`${styles.paragraph} max-w-[470px] mt-5`}>
         We are revolutionizing online education with our pay-per-second feature. 
-        Students' account balances are deducted only for the time they actively participate in the meeting.
+        Students&apos; account balances are deducted only for the time they actively participate in the meeting.
         As soon as they leave, the deductions stop, ensuring a secure and
         transparent payment system that guarantees both student satisfaction and
         peace of mind.
