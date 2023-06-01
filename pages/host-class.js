@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import web3modal from "web3modal";
 import { address, abi } from "../config.js";
@@ -29,19 +29,22 @@ export default function Publish() {
 
     console.log(formInput);
 
+    const [location, setLocation] = useState();
+    useEffect(() => {
+      setLocation(window.location);
+    }, []);
+
     async function publish() {
+        console.log('clicked')
         const meetingId = await createMeeting();
 
-        // const amountInWei = ethers.BigNumber.from(formInput.flowrate);
-        // const monthlyAmount = ethers.utils.formatEther(amountInWei.toString());
-        // const calculatedFlowRate = monthlyAmount * 3600 * 24 * 30;
+        // const calculatedFlowRate = calculateFlowRate();
         const calculatedFlowRate = 385802469135802;
 
         if (
             (!formInput.title,
             !formInput.description,
-            !formInput.time,
-            !meetingId,
+            !formInput.startTime,
             !formInput.stringFlowRate)
         )
             return;
@@ -74,15 +77,22 @@ export default function Publish() {
     }
 
     async function createMeeting() {
-      const response = await fetch(`http://localhost:3000/api/create-room`);
+      const response = await fetch(`${location.origin}/api/create-room`);
       const resJson = await response.json();
       const meetingId = resJson.data.roomId;
       return meetingId;
     }
 
+    async function calculateFlowRate() {
+        const amountInWei = ethers.BigNumber.from(formInput.stringFlowRate);
+        const monthlyAmount = ethers.utils.formatEther(amountInWei.toString());
+        const value = monthlyAmount * 3600 * 24 * 30;
+        return value
+    }
+
     async function debug() {
-      const roomId = await createMeeting()
-        console.log(roomId);
+        const x = await calculateFlowRate()
+        console.log(x)
     }
 
     return (
