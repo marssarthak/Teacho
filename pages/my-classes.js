@@ -14,7 +14,7 @@ import {
     useRoom,
 } from "@huddle01/react/hooks";
 import { Audio, Video } from "@huddle01/react/components";
-import { getEthersProvider } from "@/functions";
+// import { getEthersProvider } from "@/functions";
 
 export default function MyClasses() {
     // const receiverAddress = `0x248F5db296Ae4D318816e72c25c93e620341f621`;
@@ -22,10 +22,12 @@ export default function MyClasses() {
 
     const { initialize, isInitialized } = useHuddle01();
     const { joinLobby } = useLobby();
-    const { fetchAudioStream, stopAudioStream, error: micError } = useAudio();
+    const { fetchAudioStream, stopAudioStream, produceAudio, stopProducingAudio, stream: micStream, error: micError } = useAudio();
     const {
         fetchVideoStream,
         stopVideoStream,
+        produceVideo,
+        stopProducingVideo,
         stream: camStream,
         error: camError,
     } = useVideo();
@@ -39,7 +41,7 @@ export default function MyClasses() {
     });
     useEventListener("lobby:joined", () => {
         console.log("lobby:joined");
-        runHardware()
+        // runHardware()
     });
 
     async function runHardware() {
@@ -48,6 +50,20 @@ export default function MyClasses() {
         }
         if (fetchAudioStream.isCallable) {
             fetchAudioStream();
+        }
+    }
+    async function produceHardware() {
+        // if (fetchVideoStream.isCallable) {
+        //     fetchVideoStream();
+        // }
+        if (produceVideo.isCallable) {
+            produceVideo(camStream);
+        }
+        // if (fetchAudioStream.isCallable) {
+        //     fetchAudioStream();
+        // }
+        if (produceAudio.isCallable) {
+            produceAudio(micStream);
         }
     }
 
@@ -70,13 +86,13 @@ export default function MyClasses() {
     const [gigs, setGigs] = useState([]);
     const [userAddress, setUserAddress] = useState();
 
-    // async function getEthersProvider() {
-    //     const infuraKey = process.env.NEXT_PUBLIC_INFURA_KEY;
-    //     const provider = new ethers.providers.JsonRpcProvider(
-    //         `https://polygon-mumbai.infura.io/v3/${infuraKey}`
-    //     );
-    //     return provider;
-    // }
+    async function getEthersProvider() {
+        const infuraKey = process.env.NEXT_PUBLIC_INFURA_KEY;
+        const provider = new ethers.providers.JsonRpcProvider(
+            `https://polygon-mumbai.infura.io/v3/${infuraKey}`
+        );
+        return provider;
+    }
 
     useEffect(() => {
         sfInitialize();
@@ -146,17 +162,18 @@ export default function MyClasses() {
     async function joinMeeting(prop) {
         joinLobby(prop.meetingId);
 
-        // await startFlow(prop.host, prop.flowRate);
+        await startFlow(prop.host, prop.flowRate);
+        console.log(`https://app.superfluid.finance/dashboard/${prop.host}`)
         // await getFlowInfo(prop.host);
     }
 
     async function endMeeting(prop) {
-        stopHardware()
         if (leaveRoom.isCallable) {
             leaveRoom();
         }
+        stopHardware()
 
-        // await stopFlow(prop.host);
+        await stopFlow(prop.host);
     }
 
     async function startFlow(xReceiverAddress, xFlowRate) {
@@ -345,17 +362,18 @@ export default function MyClasses() {
                             className="w-96 h-auto p-8 rounded-lg bg-black-gradient-3 text-black"
                         ></video>
                         {/* <div className="w-96 h-96 bg-white text-black"> */}
-                        <div className="grid grid-cols-4">
+                        <div className=" w-96 h-auto mt-5 mb-5 rounded-lg bg-black-gradient-3 text-white ">
                             {Object.values(peers)
                                 .filter((peer) => peer.cam)
                                 .map((peer) => (
                                     <>
-                                        role: {peer.role}
+                                        {/* role: {peer.role} */}
                                         <Video
                                             key={peer.peerId}
                                             peerId={peer.peerId}
                                             track={peer.cam}
                                             debug
+                                            className="h-full w-full"
                                         />
                                     </>
                                 ))}
@@ -369,6 +387,10 @@ export default function MyClasses() {
                                     />
                                 ))}
                         </div>
+
+                        <button onClick={produceHardware}>Produce</button>
+
+                        {/* ----------- */}
 
                         <div className="flex gap-2">
                             {/* Webcam */}
@@ -388,6 +410,8 @@ export default function MyClasses() {
                             </button>
                         </div>
 
+                        {/* ----------- */}
+
                         <div className="flex gap-2">
                             {/* Webcam */}
                             <button
@@ -405,6 +429,8 @@ export default function MyClasses() {
                                 Audio off
                             </button>
                         </div>
+
+                        {/* ----------- */}
 
                         <button
                             disabled={!joinRoom.isCallable}

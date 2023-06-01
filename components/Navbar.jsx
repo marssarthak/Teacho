@@ -4,7 +4,9 @@ import { close, logo, menu } from "../assets";
 import { navLinks } from "../constants";
 import Image from "next/image";
 import Link from "next/link";
-import Login from "./Login";
+// import Login from "./Login";
+import { ConnectKitButton } from 'connectkit';
+
 const Navbar = () => {
   const [active, setActive] = useState("Home");
   const [toggle, setToggle] = useState(false);
@@ -26,7 +28,8 @@ const Navbar = () => {
           </li>
         ))}
         <li className="font-poppins font-normal cursor-pointer text-[16px] ml-10">
-        <Login />
+        {/* <Login /> */}
+        <ConnectKitButton />
         </li>
       </ul>
 
@@ -56,7 +59,8 @@ const Navbar = () => {
               </li>
             ))}
           </ul>
-          <Login />
+          {/* <Login /> */}
+          <ConnectKitButton />
         </div>
       </div>
     </nav>
