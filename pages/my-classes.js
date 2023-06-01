@@ -342,7 +342,7 @@ export default function MyClasses() {
                             ref={videoRef}
                             autoPlay
                             muted
-                            className="w-96 h-96 bg-white text-black"
+                            className="w-96 h-auto p-8 rounded-lg bg-black-gradient-3 text-black"
                         ></video>
                         {/* <div className="w-96 h-96 bg-white text-black"> */}
                         <div className="grid grid-cols-4">
