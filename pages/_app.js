@@ -51,7 +51,7 @@ const theme = extendBaseTheme({
 
 const infuraKey = process.env.NEXT_PUBLIC_INFURA_KEY;
 const infuraId = `https://polygon-mumbai.infura.io/v3/${infuraKey}`;
-const walletConnectProjectId = process.env.WALLETCONNECT_PROJECT_ID;
+const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
 
 const chains = [polygonMumbai, polygon];
 

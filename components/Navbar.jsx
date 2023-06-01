@@ -3,6 +3,7 @@ import { useState } from "react";
 import { close, logo, menu } from "../assets";
 import { navLinks } from "../constants";
 import Image from "next/image";
+import transparentLogo from "../assets/logo_transparent.png"
 import Link from "next/link";
 // import Login from "./Login";
 import { ConnectKitButton } from 'connectkit';
@@ -13,7 +14,7 @@ const Navbar = () => {
 
   return (
     <nav className="w-full flex py-6 justify-between items-center navbar">
-      <Image src={logo} alt="teacho" className="w-[124px] h-[32px]" />
+      <Image src={transparentLogo} alt="teacho" className="w-[150px] h-auto" />
 
       <ul className="list-none sm:flex hidden justify-end items-center flex-1">
         {navLinks.map((nav, index) => (
