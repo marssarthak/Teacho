@@ -14,7 +14,6 @@ import {
     useRoom,
 } from "@huddle01/react/hooks";
 import { Audio, Video } from "@huddle01/react/components";
-// import { getEthersProvider } from "@/functions";
 
 export default function MyClasses() {
     // const receiverAddress = `0x248F5db296Ae4D318816e72c25c93e620341f621`;
@@ -22,7 +21,14 @@ export default function MyClasses() {
 
     const { initialize, isInitialized } = useHuddle01();
     const { joinLobby } = useLobby();
-    const { fetchAudioStream, stopAudioStream, produceAudio, stopProducingAudio, stream: micStream, error: micError } = useAudio();
+    const {
+        fetchAudioStream,
+        stopAudioStream,
+        produceAudio,
+        stopProducingAudio,
+        stream: micStream,
+        error: micError,
+    } = useAudio();
     const {
         fetchVideoStream,
         stopVideoStream,
@@ -41,6 +47,9 @@ export default function MyClasses() {
     });
     useEventListener("lobby:joined", () => {
         console.log("lobby:joined");
+        // if (joinRoom.isCallable) {
+        //     joinRoom();
+        // }
         // runHardware()
     });
 
@@ -86,12 +95,18 @@ export default function MyClasses() {
     const [gigs, setGigs] = useState([]);
     const [userAddress, setUserAddress] = useState();
 
-    async function getEthersProvider() {
-        const infuraKey = process.env.NEXT_PUBLIC_INFURA_KEY;
-        const provider = new ethers.providers.JsonRpcProvider(
-            `https://polygon-mumbai.infura.io/v3/${infuraKey}`
-        );
-        return provider;
+    async function joinMeeting(prop) {
+        joinLobby(prop.meetingId);
+        await startFlow(prop.host, prop.flowRate);
+        // await getFlowInfo(prop.host);
+    }
+
+    async function endMeeting(prop) {
+        if (leaveRoom.isCallable) {
+            leaveRoom();
+        }
+        stopHardware();
+        await stopFlow(prop.host);
     }
 
     useEffect(() => {
@@ -100,6 +115,14 @@ export default function MyClasses() {
         fetchMyClasses();
         initialize("KL1r3E1yHfcrRbXsT4mcE-3mK60Yc3YR");
     }, []);
+
+    async function getEthersProvider() {
+        const infuraKey = process.env.NEXT_PUBLIC_INFURA_KEY;
+        const provider = new ethers.providers.JsonRpcProvider(
+            `https://polygon-mumbai.infura.io/v3/${infuraKey}`
+        );
+        return provider;
+    }
 
     async function sfInitialize() {
         const provider = await getEthersProvider();
@@ -159,28 +182,12 @@ export default function MyClasses() {
         return itemsFetched;
     }
 
-    async function joinMeeting(prop) {
-        joinLobby(prop.meetingId);
-
-        await startFlow(prop.host, prop.flowRate);
-        console.log(`https://app.superfluid.finance/dashboard/${recipient}`)
-        // await getFlowInfo(prop.host);
-    }
-
-    async function endMeeting(prop) {
-        if (leaveRoom.isCallable) {
-            leaveRoom();
-        }
-        stopHardware()
-
-        await stopFlow(prop.host);
-    }
-
     async function startFlow(xReceiverAddress, xFlowRate) {
         const senderAddress = await fetchUserAddress();
-        const xSuperToken = await sfInitialize();
-
+        if (senderAddress.toUpperCase() == xReceiverAddress.toUpperCase()) return
         console.log(senderAddress, xReceiverAddress, xFlowRate);
+
+        const xSuperToken = await sfInitialize();
 
         const modal = new web3modal({
             network: "mumbai",
@@ -199,9 +206,15 @@ export default function MyClasses() {
         const txnResponse = await createFlowOperation.exec(signer);
         const txnReceipt = await txnResponse.wait();
         console.log("started");
+        console.log(
+            `https://app.superfluid.finance/dashboard/${xReceiverAddress}`
+        );
     }
 
     async function stopFlow(xReceiverAddress) {
+
+        if (userAddress?.toUpperCase() == xReceiverAddress?.toUpperCase()) return
+
         const modal = new web3modal({
             network: "mumbai",
             cacheProvider: true,
@@ -222,6 +235,8 @@ export default function MyClasses() {
 
     async function getFlowInfo(xReceiverAddress) {
         const provider = await getEthersProvider();
+        if (userAddress == xReceiverAddress) return
+        
         const flowInfo = await superToken.getFlow({
             sender: userAddress,
             receiver: xReceiverAddress,
@@ -298,25 +313,6 @@ export default function MyClasses() {
                     </section>
                 </div>
             </div>
-            // <div className="mb-5">
-            //     <p>{prop.title}</p>
-            //     <p>{prop.description}</p>
-            //     <p>{prop.time}</p>
-            //     <p>{prop.stringFlowRate} Matic/Hour</p>
-            // {/* <TestJoinMeeting
-            //     host={prop.host}
-            //     title={prop.title}
-            //     description={prop.description}
-            //     time={prop.time}
-            //     meetingId={prop.meetingId}
-            //     flowRate={prop.flowRate}
-            //     stringFlowRate={prop.stringFlowRate}
-            //     gigId={prop.gigId}
-            // /> */}
-            //     {/* <button onClick={() => TestJoinMeeting(prop)}>Join Test Meeting</button> */}
-            //     <button onClick={() => joinMeeting(prop)}>Join Meeting</button>
-            //     {/* <button onClick={() => endMeeting(prop)}>End Meeting</button> */}
-            // </div>
         );
     }
 
@@ -355,6 +351,7 @@ export default function MyClasses() {
                         ))}
                     </div>
                     <div className="flex-1 flex flex-col items-center">
+                        {/* <div className="w-96 h-auto mt-5 mb-5 rounded-lg bg-black-gradient-3 text-white"> */}
                         <video
                             ref={videoRef}
                             autoPlay
@@ -388,57 +385,55 @@ export default function MyClasses() {
                                 ))}
                         </div>
 
-                        <button onClick={produceHardware}>Produce</button>
-
                         {/* ----------- */}
 
                         <div className="flex gap-2">
-                            {/* Webcam */}
+                            {/* Webcam */} Video :
                             <button
                                 disabled={!fetchVideoStream.isCallable}
                                 onClick={fetchVideoStream}
                             >
-                                Video on
+                                on
                             </button>
-
-                            {/* Mic */}
-                            <button
-                                disabled={!fetchAudioStream.isCallable}
-                                onClick={fetchAudioStream}
-                            >
-                                Audio on
-                            </button>
-                        </div>
-
-                        {/* ----------- */}
-
-                        <div className="flex gap-2">
                             {/* Webcam */}
                             <button
                                 disabled={!stopVideoStream.isCallable}
                                 onClick={stopVideoStream}
                             >
-                                Video off
-                            </button>
-
-                            {/* Mic */}
-                            <button
-                                disabled={!stopAudioStream.isCallable}
-                                onClick={stopAudioStream}
-                            >
-                                Audio off
+                                off
                             </button>
                         </div>
 
                         {/* ----------- */}
 
-                        <button
-                            disabled={!joinRoom.isCallable}
-                            onClick={joinRoom}
-                        >
-                            Join meeting
-                        </button>
+                        <div className="flex gap-2">
+                            {/* Mic */}Audio :{/* Mic */}
+                            <button
+                                disabled={!fetchAudioStream.isCallable}
+                                onClick={fetchAudioStream}
+                            >
+                                on
+                            </button>
+                            <button
+                                disabled={!stopAudioStream.isCallable}
+                                onClick={stopAudioStream}
+                            >
+                                off
+                            </button>
+                        </div>
 
+                        {/* ----------- */}
+
+                        <div className="flex gap-2">
+                            <button
+                                disabled={!joinRoom.isCallable}
+                                onClick={joinRoom}
+                            >
+                                Join
+                            </button>
+
+                            <button onClick={produceHardware}>Stream</button>
+                        </div>
                         <button onClick={endMeeting}>End Meeting</button>
                     </div>
                 </div>
