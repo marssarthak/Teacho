@@ -163,7 +163,7 @@ export default function MyClasses() {
         joinLobby(prop.meetingId);
 
         await startFlow(prop.host, prop.flowRate);
-        console.log(`https://app.superfluid.finance/dashboard/${prop.host}`)
+        console.log(`https://app.superfluid.finance/dashboard/${recipient}`)
         // await getFlowInfo(prop.host);
     }
 
