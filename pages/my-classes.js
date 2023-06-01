@@ -7,6 +7,7 @@ import styles from "../styles/style";
 import { Navbar } from "../components";
 import { useHuddle01 } from "@huddle01/react";
 import { useLobby, useAudio, useVideo } from "@huddle01/react/hooks";
+import { getEthersProvider } from "@/functions";
 
 export default function MyClasses() {
     // const receiverAddress = `0x248F5db296Ae4D318816e72c25c93e620341f621`;
@@ -22,13 +23,13 @@ export default function MyClasses() {
     const { fetchAudioStream, stopAudioStream, error: micError } = useAudio();
     const { fetchVideoStream, stopVideoStream, error: camError } = useVideo();
 
-    async function getEthersProvider() {
-        const infuraKey = process.env.NEXT_PUBLIC_INFURA_KEY;
-        const provider = new ethers.providers.JsonRpcProvider(
-            `https://polygon-mumbai.infura.io/v3/${infuraKey}`
-        );
-        return provider;
-    }
+    // async function getEthersProvider() {
+    //     const infuraKey = process.env.NEXT_PUBLIC_INFURA_KEY;
+    //     const provider = new ethers.providers.JsonRpcProvider(
+    //         `https://polygon-mumbai.infura.io/v3/${infuraKey}`
+    //     );
+    //     return provider;
+    // }
 
     useEffect(() => {
         sfInitialize();

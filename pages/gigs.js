@@ -4,7 +4,7 @@ import web3modal from "web3modal";
 import { address, abi } from "../config.js";
 import styles from "../styles/style";
 import { Navbar } from "../components";
-import Image from "next/image.js";
+import { getEthersProvider } from "@/functions";
 
 export default function Gigs() {
     const [gigs, setGigs] = useState([]);
@@ -13,13 +13,13 @@ export default function Gigs() {
         fetchAllGigs()
     }, []);
 
-    async function getEthersProvider() {
-        const infuraKey = process.env.NEXT_PUBLIC_INFURA_KEY;
-        const provider = new ethers.providers.JsonRpcProvider(
-            `https://polygon-mumbai.infura.io/v3/${infuraKey}`
-        );
-        return provider;
-    }
+    // async function getEthersProvider() {
+    //     const infuraKey = process.env.NEXT_PUBLIC_INFURA_KEY;
+    //     const provider = new ethers.providers.JsonRpcProvider(
+    //         `https://polygon-mumbai.infura.io/v3/${infuraKey}`
+    //     );
+    //     return provider;
+    // }
 
     async function fetchAllGigs() {
         const provider = await getEthersProvider();
@@ -129,7 +129,7 @@ export default function Gigs() {
                 </div>
             </div>
             <div>
-                <div className="">
+                <div className="pb-20">
                     {gigs.map((item, i) => (
                         <Card
                             key={i}

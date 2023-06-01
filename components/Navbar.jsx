@@ -4,7 +4,7 @@ import { close, logo, menu } from "../assets";
 import { navLinks } from "../constants";
 import Image from "next/image";
 import Link from "next/link";
-
+import Login from "./Login";
 const Navbar = () => {
   const [active, setActive] = useState("Home");
   const [toggle, setToggle] = useState(false);
@@ -25,6 +25,9 @@ const Navbar = () => {
             <Link href={nav.id}>{nav.title}</Link>
           </li>
         ))}
+        <li className="font-poppins font-normal cursor-pointer text-[16px] ml-10">
+        <Login />
+        </li>
       </ul>
 
       <div className="sm:hidden flex flex-1 justify-end items-center">
@@ -53,6 +56,7 @@ const Navbar = () => {
               </li>
             ))}
           </ul>
+          <Login />
         </div>
       </div>
     </nav>
