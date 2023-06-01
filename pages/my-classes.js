@@ -1,26 +1,73 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Framework } from "@superfluid-finance/sdk-core";
 import { ethers } from "ethers";
 import web3modal from "web3modal";
 import { address, abi } from "../config.js";
 import styles from "../styles/style";
 import { Navbar } from "../components";
-import { useHuddle01 } from "@huddle01/react";
-import { useLobby, useAudio, useVideo } from "@huddle01/react/hooks";
+import { useHuddle01, useEventListener } from "@huddle01/react";
+import {
+    useLobby,
+    useAudio,
+    useVideo,
+    usePeers,
+    useRoom,
+} from "@huddle01/react/hooks";
+import { Audio, Video } from "@huddle01/react/components";
 
 export default function MyClasses() {
     // const receiverAddress = `0x248F5db296Ae4D318816e72c25c93e620341f621`;
     // const flowRate = `385802469135802`;
 
+    const { initialize, isInitialized } = useHuddle01();
+    const { joinLobby } = useLobby();
+    const { fetchAudioStream, stopAudioStream, error: micError } = useAudio();
+    const {
+        fetchVideoStream,
+        stopVideoStream,
+        stream: camStream,
+        error: camError,
+    } = useVideo();
+    const { joinRoom, leaveRoom } = useRoom();
+
+    const videoRef = useRef();
+    const { peers } = usePeers();
+
+    useEventListener("room:joined", () => {
+        console.log("room:joined");
+    });
+    useEventListener("lobby:joined", () => {
+        console.log("lobby:joined");
+        runHardware()
+    });
+
+    async function runHardware() {
+        if (fetchVideoStream.isCallable) {
+            fetchVideoStream();
+        }
+        if (fetchAudioStream.isCallable) {
+            fetchAudioStream();
+        }
+    }
+
+    async function stopHardware() {
+        if (stopVideoStream.isCallable) {
+            stopVideoStream();
+        }
+        if (stopAudioStream.isCallable) {
+            stopAudioStream();
+        }
+    }
+
+    useEventListener("lobby:cam-on", () => {
+        if (camStream && videoRef.current)
+            videoRef.current.srcObject = camStream;
+    });
+
     const superTokenAddress = `0x96B82B65ACF7072eFEb00502F45757F254c2a0D4`;
     const [superToken, setSuperToken] = useState();
     const [gigs, setGigs] = useState([]);
     const [userAddress, setUserAddress] = useState();
-
-    const { initialize, isInitialized } = useHuddle01();
-    const { joinLobby } = useLobby();
-    const { fetchAudioStream, stopAudioStream, error: micError } = useAudio();
-    const { fetchVideoStream, stopVideoStream, error: camError } = useVideo();
 
     async function getEthersProvider() {
         const infuraKey = process.env.NEXT_PUBLIC_INFURA_KEY;
@@ -95,49 +142,20 @@ export default function MyClasses() {
         return itemsFetched;
     }
 
-    function TestJoinMeeting(prop) {
-        joinLobby(prop.meetingId)
-        fetchAudioStream
-
-        // return (
-        //     <div className="flex gap-4">
-        //         {isInitialized ? "Hello World!" : "Please initialize"}
-        //         <button
-        //             disabled={joinLobby.isCallable}
-        //             onClick={() => joinLobby(prop.meetingId)}
-        //         >
-        //             {console.log(prop.meetingId)}
-        //             Join Lobby
-        //         </button>
-
-        //         {/* Mic */}
-        //         <button
-        //             disabled={!fetchAudioStream.isCallable}
-        //             onClick={fetchAudioStream}
-        //         >
-        //             FETCH_AUDIO_STREAM
-        //         </button>
-
-        //         {/* Webcam */}
-        //         <button
-        //             disabled={!fetchVideoStream.isCallable}
-        //             onClick={fetchVideoStream}
-        //         >
-        //             FETCH_VIDEO_STREAM
-        //         </button>
-        //     </div>
-        // );
-    }
-
     async function joinMeeting(prop) {
-        // join meeting
-        await startFlow(prop.host, prop.flowRate);
-        await getFlowInfo(prop.host);
+        joinLobby(prop.meetingId);
+
+        // await startFlow(prop.host, prop.flowRate);
+        // await getFlowInfo(prop.host);
     }
 
     async function endMeeting(prop) {
-        // end meeting
-        await stopFlow(prop.host);
+        stopHardware()
+        if (leaveRoom.isCallable) {
+            leaveRoom();
+        }
+
+        // await stopFlow(prop.host);
     }
 
     async function startFlow(xReceiverAddress, xFlowRate) {
@@ -195,7 +213,7 @@ export default function MyClasses() {
     }
 
     function Card(prop) {
-        const add0 = t => t < 10 ? `0${t}` : String(t);
+        const add0 = (t) => (t < 10 ? `0${t}` : String(t));
         const getDateStandard = (dt) => {
             const y = dt.getFullYear();
             const m = add0(dt.getMonth() + 1);
@@ -204,59 +222,79 @@ export default function MyClasses() {
             const h = add0(dt.getHours());
             const min = add0(dt.getMinutes());
             return `${d}-${m}-${y} ${w} ${h}:${min}`;
-          };
-        const dateTime = new Date(prop.time)
+        };
+        const dateTime = new Date(prop.time);
         return (
             <div className={`bg-primary ${styles.flexStart}`}>
-            <div className={`${styles.boxWidth}`}>
-              <section
-                className={`${styles.flexCenter} ${styles.marginY} !mb-0 ${styles.padding}sm:flex-row flex-col bg-black-gradient-3 rounded-[20px] box-shadow mx-10`}
-              >
-                <div className="flex-1 flex flex-col w-full">
-                  <div className="flex items-center justify-between w-full">
-                    <div className="grow-[3] max-w-[75%]">
-                      <h1 className="flex-1 font-poppins font-semibold ss:text-[40px] text-[32px] text-white ss:leading-[50.8px] leading-[45px] capitalize">
-                        {prop.title}
-                      </h1>
-                      <p className="font-thin text-slate-200 mt-1 leading-5">
-                        {prop.description}
-                      </p>
-                      <p className="mt-3 text-gray-500">
-                        Date: {getDateStandard(dateTime)}
-                      </p>
-                    </div>
-                    <div className="flex flex-1 justify-center items-end flex-col">
-                      <p className="mr-6">
-                        Price: {prop.stringFlowRate} Matic/Hour
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => joinMeeting(prop)}
-                        className={`py-4 mt-2 px-12 font-poppins font-medium text-[18px] text-primary bg-blue-gradient rounded-[10px] outline-none ${styles}`}
-                      >
-                        Join Meeting
-                      </button>
-                    </div>
-                  </div>
+                <div className={`${styles.boxWidth}`}>
+                    <section
+                        className={`${styles.flexCenter} ${styles.marginY} !mb-0 ${styles.padding}sm:flex-row flex-col bg-black-gradient-3 rounded-[20px] box-shadow mx-10`}
+                    >
+                        <div className="flex-1 flex flex-col w-full">
+                            <div className="flex items-center justify-between w-full">
+                                <div className="grow-[3] max-w-[75%]">
+                                    <h1 className="flex-1 font-poppins font-semibold ss:text-[40px] text-[32px] text-white ss:leading-[50.8px] leading-[45px] capitalize">
+                                        {prop.title}
+                                    </h1>
+                                    <p className="font-thin text-slate-200 mt-1 leading-5">
+                                        {prop.description}
+                                    </p>
+                                    <p className="mt-3 text-gray-500">
+                                        Date: {getDateStandard(dateTime)}
+                                    </p>
+                                </div>
+                                <div className="flex flex-1 justify-center items-end flex-col">
+                                    <p className="mr-6">
+                                        Price: {prop.stringFlowRate} Matic/Hour
+                                    </p>
+                                    <button
+                                        type="button"
+                                        onClick={() => joinMeeting(prop)}
+                                        className={`py-4 mt-2 px-12 font-poppins font-medium text-[18px] text-primary bg-blue-gradient rounded-[10px] outline-none ${styles}`}
+                                    >
+                                        Launch Meeting
+                                    </button>
+                                    {/* <button
+                                        disabled={joinLobby.isCallable}
+                                        onClick={() =>
+                                            joinLobby(prop.meetingId)
+                                        }
+                                        className={`py-4 mt-2 px-12 font-poppins font-medium text-[18px] text-primary bg-blue-gradient rounded-[10px] outline-none ${styles}`}
+                                    >
+                                        
+                                        Join Lobby
+                                    </button> */}
+                                    {/* <TestJoinMeeting
+                                        host={prop.host}
+                                        title={prop.title}
+                                        description={prop.description}
+                                        time={prop.time}
+                                        meetingId={prop.meetingId}
+                                        flowRate={prop.flowRate}
+                                        stringFlowRate={prop.stringFlowRate}
+                                        gigId={prop.gigId}
+                                    /> */}
+                                </div>
+                            </div>
+                        </div>
+                    </section>
                 </div>
-              </section>
             </div>
-          </div>
             // <div className="mb-5">
             //     <p>{prop.title}</p>
             //     <p>{prop.description}</p>
             //     <p>{prop.time}</p>
             //     <p>{prop.stringFlowRate} Matic/Hour</p>
-            //     {/* <TestJoinMeeting
-            //         host={prop.host}
-            //         title={prop.title}
-            //         description={prop.description}
-            //         time={prop.time}
-            //         meetingId={prop.meetingId}
-            //         flowRate={prop.flowRate}
-            //         stringFlowRate={prop.stringFlowRate}
-            //         gigId={prop.gigId}
-            //     /> */}
+            // {/* <TestJoinMeeting
+            //     host={prop.host}
+            //     title={prop.title}
+            //     description={prop.description}
+            //     time={prop.time}
+            //     meetingId={prop.meetingId}
+            //     flowRate={prop.flowRate}
+            //     stringFlowRate={prop.stringFlowRate}
+            //     gigId={prop.gigId}
+            // /> */}
             //     {/* <button onClick={() => TestJoinMeeting(prop)}>Join Test Meeting</button> */}
             //     <button onClick={() => joinMeeting(prop)}>Join Meeting</button>
             //     {/* <button onClick={() => endMeeting(prop)}>End Meeting</button> */}
@@ -282,27 +320,101 @@ export default function MyClasses() {
                 {/* <button onClick={startFlow}>start flow</button>
             <button onClick={stopFlow}>stop flow</button>
             <button onClick={getFlowInfo}>Get info</button> */}
-            <div className="flex">
-                <div className="pb-20 flex-1">
-                    {gigs.map((item, i) => (
-                        <Card
-                            key={i}
-                            host={item.host}
-                            title={item.title}
-                            description={item.description}
-                            time={item.time}
-                            meetingId={item.meetingId}
-                            flowRate={item.flowRate}
-                            stringFlowRate={item.stringFlowRate}
-                            gigId={item.gigId}
-                        />
-                    ))}
+                <div className="flex">
+                    <div className="pb-20 flex-1">
+                        {gigs.map((item, i) => (
+                            <Card
+                                key={i}
+                                host={item.host}
+                                title={item.title}
+                                description={item.description}
+                                time={item.time}
+                                meetingId={item.meetingId}
+                                flowRate={item.flowRate}
+                                stringFlowRate={item.stringFlowRate}
+                                gigId={item.gigId}
+                            />
+                        ))}
+                    </div>
+                    <div className="flex-1 flex flex-col items-center">
+                        <video
+                            ref={videoRef}
+                            autoPlay
+                            muted
+                            className="w-96 h-96 bg-white text-black"
+                        ></video>
+                        {/* <div className="w-96 h-96 bg-white text-black"> */}
+                        <div className="grid grid-cols-4">
+                            {Object.values(peers)
+                                .filter((peer) => peer.cam)
+                                .map((peer) => (
+                                    <>
+                                        role: {peer.role}
+                                        <Video
+                                            key={peer.peerId}
+                                            peerId={peer.peerId}
+                                            track={peer.cam}
+                                            debug
+                                        />
+                                    </>
+                                ))}
+                            {Object.values(peers)
+                                .filter((peer) => peer.mic)
+                                .map((peer) => (
+                                    <Audio
+                                        key={peer.peerId}
+                                        peerId={peer.peerId}
+                                        track={peer.mic}
+                                    />
+                                ))}
+                        </div>
+
+                        <div className="flex gap-2">
+                            {/* Webcam */}
+                            <button
+                                disabled={!fetchVideoStream.isCallable}
+                                onClick={fetchVideoStream}
+                            >
+                                Video on
+                            </button>
+
+                            {/* Mic */}
+                            <button
+                                disabled={!fetchAudioStream.isCallable}
+                                onClick={fetchAudioStream}
+                            >
+                                Audio on
+                            </button>
+                        </div>
+
+                        <div className="flex gap-2">
+                            {/* Webcam */}
+                            <button
+                                disabled={!stopVideoStream.isCallable}
+                                onClick={stopVideoStream}
+                            >
+                                Video off
+                            </button>
+
+                            {/* Mic */}
+                            <button
+                                disabled={!stopAudioStream.isCallable}
+                                onClick={stopAudioStream}
+                            >
+                                Audio off
+                            </button>
+                        </div>
+
+                        <button
+                            disabled={!joinRoom.isCallable}
+                            onClick={joinRoom}
+                        >
+                            Join meeting
+                        </button>
+
+                        <button onClick={endMeeting}>End Meeting</button>
+                    </div>
                 </div>
-                <div className="flex-1 flex flex-col items-center">
-                    <div className="w-96 h-96 bg-white text-black">camera</div>
-                     <button>End Meeting</button>
-                </div>
-            </div>
             </div>
         </div>
     );
